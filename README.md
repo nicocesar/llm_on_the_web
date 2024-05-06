@@ -3,10 +3,11 @@ Connecting Open AI function calling with a generic Javascript console in a headl
 
 # Usage
 
+```
 $ python3 -m venv .venv
 $ . .venv/bin/activate
 (.venv) $ pip3 install -r requirements.txt
 
 $ export OPENAI_API_KEY="sk-...."
 $ ./main.py
-
+```
