@@ -28,7 +28,7 @@ client = OpenAI()
 
 def run_conversation():
     # Step 1: send the conversation and available functions to the model
-    messages = [{"role": "user", "content": "What are all the links in plain english of wikipedia front page?"}]
+    messages = [{"role": "user", "content": "What are all the links in plain english of wikipedia front page? If needed go get the real page title from each URL. Avoid duplicates and place the title and URL separated by a comma. All URLs should be absolute paths"}]
     tools = [
         {
             "type": "function",
