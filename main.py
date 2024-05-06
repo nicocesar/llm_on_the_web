@@ -10,7 +10,7 @@ async def webAsync(url, javascript_commands):
     await page.goto(url)
     return_array=[]
     for javascript_string in javascript_commands:
-        result = await page.evaluate(javascript_string)
+        result = await page.evaluate("() => ( %s )" % javascript_string)
         return_array.append(result)
     await browser.close()    
     return return_array
@@ -28,7 +28,7 @@ client = OpenAI()
 
 def run_conversation():
     # Step 1: send the conversation and available functions to the model
-    messages = [{"role": "user", "content": "What's the content in plain english of wikipedia front page?"}]
+    messages = [{"role": "user", "content": "What are all the links in plain english of wikipedia front page?"}]
     tools = [
         {
             "type": "function",
@@ -91,5 +91,5 @@ def run_conversation():
             messages=messages,
         )  # get a new response from the model where it can see the function response
         return second_response
-print(run_conversation())
+print(run_conversation().choices[0].message.content)
 
