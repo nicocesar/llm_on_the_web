@@ -1,19 +1,49 @@
 #!/usr/bin/env python3
 import asyncio
+import re
 from pyppeteer import launch
 from openai import OpenAI
+
+from playwright.async_api import async_playwright
+
 import json
 
-async def webAsync(url, javascript_commands):
+async def webAsyncPyppeteer(url, javascript_commands):
     browser = await launch(headless=True)
     page = await browser.newPage()
     await page.goto(url)
     return_array=[]
     for javascript_string in javascript_commands:
-        result = await page.evaluate("() => ( %s )" % javascript_string)
+        result = await page.evaluate("() => %s" % javascript_string)
         return_array.append(result)
     await browser.close()    
     return return_array
+
+async def webAsync(url, javascript_commands):
+
+    async with async_playwright() as p:
+        # Launch the browser in headless mode
+        browser = await p.chromium.launch(headless=True)
+        # Open a new page
+        page = await browser.new_page()
+        # Navigate to the URL
+        await page.goto(url)
+        # Evaluate the JavaScript expression
+        return_array=[]
+        for javascript_string in javascript_commands:
+            # extract contents of querySelectorAll(..) using re
+            x = re.findall(r'querySelectorAll\(([^\)]*?)\)', javascript_string)
+            if x:
+                x = x[0]
+                print("waiting for selector", x)
+                await page.wait_for_selector(x)
+                print("selector found", x)
+
+            result = await page.evaluate("() => { %s }" % javascript_string)
+            return_array.append(result)
+        # Close the browser
+        await browser.close()
+        return return_array
 
 def web(url, javascript_commands):
     print("calling the web...", url, javascript_commands)
