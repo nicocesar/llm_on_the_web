@@ -26,9 +26,9 @@ def web(url, javascript_commands):
 
 client = OpenAI()
 
-def run_conversation():
+def run_conversation(question):
     # Step 1: send the conversation and available functions to the model
-    messages = [{"role": "user", "content": "What are all the links in plain english of wikipedia front page? If needed go get the real page title from each URL. Avoid duplicates and place the title and URL separated by a comma. All URLs should be absolute paths"}]
+    messages = [{"role": "user", "content": question }]
     tools = [
         {
             "type": "function",
@@ -44,7 +44,7 @@ def run_conversation():
                         },
                         "javascript_commands": {
                             "type": "array",
-                            "description": "Array of javascript commands to execute. Each command should be a string.",
+                            "description": "Array of javascript commands to execute. Each command should be a string and return a value without the use of const",
                             "items": {"type": "string"}
                         },
                     },
@@ -91,5 +91,14 @@ def run_conversation():
             messages=messages,
         )  # get a new response from the model where it can see the function response
         return second_response
-print(run_conversation().choices[0].message.content)
+
+
+import argparse
+
+parser = argparse.ArgumentParser(description="Ask a question or task to an agent that has access to Javascript console in a headless browser .")
+parser.add_argument('question', type=str, help='Question or task for an agent', nargs='+')
+args = parser.parse_args()
+question = ' '.join(args.question)
+
+print(run_conversation(question).choices[0].message.content)
 
