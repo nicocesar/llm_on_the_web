@@ -10,7 +10,10 @@ async def webAsync(url, javascript_commands):
     await page.goto(url)
     return_array=[]
     for javascript_string in javascript_commands:
-        result = await page.evaluate("() => ( %s )" % javascript_string)
+        try: 
+            result = await page.evaluate("() => ( %s )" % javascript_string)
+        except Exception as e:
+            result = str(e)
         return_array.append(result)
     await browser.close()    
     return return_array
@@ -54,7 +57,7 @@ def run_conversation(question):
         }
     ]
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo-0125",
+        model="gpt-4o",
         messages=messages,
         tools=tools,
         tool_choice="auto",  # auto is default, but we'll be explicit
@@ -87,7 +90,7 @@ def run_conversation(question):
                 }
             )  # extend conversation with function response
         second_response = client.chat.completions.create(
-            model="gpt-3.5-turbo-0125",
+            model="gpt-4o",
             messages=messages,
         )  # get a new response from the model where it can see the function response
         return second_response
